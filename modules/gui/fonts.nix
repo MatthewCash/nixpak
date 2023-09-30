@@ -9,7 +9,7 @@ with lib;
 {
   options.fonts = {
     enable = mkEnableOption "font support";
-    fonts = mkOption {
+    packages = mkOption {
       description = "Font packages to install.";
       type = with types; listOf package;
       default = with pkgs; [
@@ -24,17 +24,21 @@ with lib;
     };
   };
 
+  imports = [
+    (mkRenamedOptionModule [ "fonts" "fonts" ] [ "fonts" "packages" ])
+  ];
+
   config = let
     fontCache = pkgs.makeFontsCache {
       inherit (pkgs) fontconfig;
-      fontDirectories = cfg.fonts;
+      fontDirectories = cfg.packages;
     };
     fontConfigFile = pkgs.writeTextDir "etc/fonts/conf.d/00-nixpak-fonts.conf" ''
       <?xml version='1.0'?>
       <!DOCTYPE fontconfig SYSTEM 'urn:fontconfig:fonts.dtd'>
       <fontconfig>
         <!-- Font directories -->
-        ${lib.concatStringsSep "\n" (map (font: "<dir>${font}</dir>") cfg.fonts)}
+        ${lib.concatStringsSep "\n" (map (font: "<dir>${font}</dir>") cfg.packages)}
         ${lib.optionalString (pkgs.stdenv.hostPlatform == pkgs.stdenv.buildPlatform) ''
         <!-- Pre-generated font caches -->
         <cachedir>${fontCache}</cachedir>
