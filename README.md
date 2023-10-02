@@ -145,6 +145,15 @@ Takes an environment variable name and resolves it to its value at runtime.
 sloth.env "HOME" # results in "/home/user" at runtime
 ```
 
+#### `sloth.realpath :: string -> Sloth`
+
+Takes a symlink and recursively resolves it to a canonical path at runtime.
+Useful for binding dependencies in the Nix store when `bubblewrap.bindEntireStore = false`
+
+```nix
+sloth.bindRo (sloth.realpath "/run/opengl-driver/lib/dri/iHD_drv_video.so") # binds the Intel VA driver
+```
+
 #### `sloth.mkdir :: Sloth -> Sloth`
 
 Ensures the presence of a directory. If it does not exist, creates it with permisions `0700`,

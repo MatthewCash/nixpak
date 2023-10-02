@@ -48,6 +48,26 @@ func (e EnvVar) String() string {
 	panic(fmt.Sprintf("environment variable '%s' not set", e.Key))
 }
 
+type Realpath struct {
+	Type string
+	Path string
+}
+
+func NewRealpath(raw JsonRaw) (e Realpath) {
+	e.Type = "realpath"
+	e.Path = valToString(raw["path"])
+	return
+}
+
+func (r Realpath) String() string {
+	path, err := filepath.EvalSymlinks(r.Path)
+	if err == nil {
+		return path
+	}
+	// If the link is not found just return the original path
+	return r.Path
+}
+
 type Concat struct {
 	Type string
 	A    string
@@ -151,6 +171,8 @@ func valToString(item any) (ret string) {
 		switch raw["type"] {
 		case "env":
 			ret = NewEnvVar(raw).String()
+		case "realpath":
+			ret = NewRealpath(raw).String()
 		case "concat":
 			ret = NewConcat(raw).String()
 		case "instanceId":
