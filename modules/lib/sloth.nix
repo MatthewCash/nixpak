@@ -4,6 +4,7 @@ let
   knownTypes = [
     "concat"
     "env"
+    "realpath"
     "instanceId"
     "mkdir"
   ];
@@ -32,6 +33,11 @@ in
       inherit key;
       "or" = or_;
       type = "env";
+    };
+
+    realpath = path: {
+      inherit path;
+      type = "realpath";
     };
 
     concat = let
